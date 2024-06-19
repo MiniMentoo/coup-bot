@@ -49,6 +49,7 @@ module.exports = {
 				await confirmation.update({ content: 'Action cancelled', components: [] });
 			}
 	} catch (e) {
+		console.log(e);
 		await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling', components: [] });
 	}
 	},
@@ -67,12 +68,22 @@ function shuffle(array) {
 function startGame(bonus, guildId) {
 	const quantity = 3 + bonus;
 	const cardType = ['captain', 'assassin', 'ambassador', 'duke', 'contessa'];
-	const deck = [];
+	let deck = [];
 	cardType.forEach(type => { 
 		for(let i = 0; i < quantity; i++){
 			deck.push(type); }
 		}
 	);
-	console.log(deck);
-	console.log(shuffle(deck));
+	deck = shuffle(deck);
+	let players = global.games.get(guildId);
+	let gameHands = global.hands.get(guildId);
+	players.forEach(player => {
+		let hand = gameHands.get(player);
+		hand.push(deck.splice(0,2)); //the two cards drawn added to first position in hand
+		hand.push(2); //int representing number of coins second position
+		hand.push([]); //third position represents revealed (unusable) cards
+		hand.push(true); //bool representing if player is still in game
+	});
+	global.gameInfo.set(guildId, deck);
+	console.log(global.gameInfo); //leaving this in for testing purposes delete later
 }

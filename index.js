@@ -5,6 +5,7 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 
 global.games = new Map();
+global.gameInfo = new Map();
 global.hands = new Map();
 
 

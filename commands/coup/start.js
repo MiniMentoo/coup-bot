@@ -28,10 +28,10 @@ module.exports = {
                 }
 			} else if (gameUsers.length > 7) {
 				let bonus = Math.floor((gameUsers.length - 6)/2);
-				startGame(bonus);
+				startGame(bonus, interaction.guild.id);
 				reply = `Game started with extra people added ${bonus} extra copy of each card added to deck. Do /hand to see your hand`;
 			} else {
-				startGame(0);
+				startGame(0, interaction.guild.id);
 				reply = `Game started, do /hand to see your hand!`;
 			}
         } else {
@@ -43,7 +43,7 @@ module.exports = {
 			const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
 
 			if (confirmation.customId === 'confirm') {
-				startGame(0);
+				startGame(0, interaction.guild.id);
 				await confirmation.update({ content: `Game started, do /hand to see your hand!`, components: [] });
 			} else if (confirmation.customId === 'cancel') {
 				await confirmation.update({ content: 'Action cancelled', components: [] });
@@ -55,7 +55,17 @@ module.exports = {
 };
 
 
-
-function startGame() {
-
+function startGame(bonus, guildId) {
+	let gameInfo = global.gameInfo.get(guildId);
+	if (gameInfo.length){
+		console.log("idk this shouldn't let people join if this is true right?")
+	} //first element in gameInfo is a bool representing canJoin, stops people from joining
+	const quantity = 3 + bonus;
+	let deck = {
+		captain : quantity,
+		assassin : quantity,
+		contessa : quantity,
+		ambassador : quantity,
+		duke : quantity
+	}
 }

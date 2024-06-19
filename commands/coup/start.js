@@ -29,7 +29,7 @@ module.exports = {
 			} else if (gameUsers.length > 7) {
 				let bonus = Math.floor((gameUsers.length - 6)/2);
 				startGame(bonus, interaction.guild.id);
-				reply = `Game started with extra people added ${bonus} extra copy of each card added to deck. Do /hand to see your hand`;
+				reply = `Game started with extra people, added ${bonus} extra copy of each card to deck, for a total of ${bonus + 3}. Do /hand to see your hand`;
 			} else {
 				startGame(0, interaction.guild.id);
 				reply = `Game started, do /hand to see your hand!`;
@@ -54,18 +54,25 @@ module.exports = {
 	},
 };
 
+function shuffle(array) {
+	deck = [...array];
+	len = deck.length;
+	for (let i = len -1; i > 0; i --) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[deck[i], deck[j]] = [deck[j], deck[i]];
+	}
+	return deck;
+}
 
 function startGame(bonus, guildId) {
-	let gameInfo = global.gameInfo.get(guildId);
-	if (gameInfo.length){
-		console.log("idk this shouldn't let people join if this is true right?")
-	} //first element in gameInfo is a bool representing canJoin, stops people from joining
 	const quantity = 3 + bonus;
-	let deck = {
-		captain : quantity,
-		assassin : quantity,
-		contessa : quantity,
-		ambassador : quantity,
-		duke : quantity
-	}
+	const cardType = ['captain', 'assassin', 'ambassador', 'duke', 'contessa'];
+	const deck = [];
+	cardType.forEach(type => { 
+		for(let i = 0; i < quantity; i++){
+			deck.push(type); }
+		}
+	);
+	console.log(deck);
+	console.log(shuffle(deck));
 }

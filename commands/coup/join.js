@@ -7,7 +7,7 @@ module.exports = {
     async execute(interaction) {
         let reply = ``;
         if (global.games.has(interaction.guild.id)) {
-            if (! global.gameInfo.get(interaction.guild.id).length){
+            if (global.gameInfo.get(interaction.guild.id).length){
                 reply = {content : `Sorry, the game has already started!`, ephemeral : true};
             } else{
                 let gameUsers = global.games.get(interaction.guild.id);
@@ -25,7 +25,7 @@ current members:
                 }
         }} else {
             global.games.set(interaction.guild.id, []); 
-            global.gameInfo.set(interaction.guild.id, []); //bug here m8, idfk why but this line of code does basically nothing ig fml
+            global.gameInfo.set(interaction.guild.id, []);
             global.hands.set(interaction.guild.id, new Map());
             let gameUsers = global.games.get(interaction.guild.id);
             gameUsers.push(interaction.user);

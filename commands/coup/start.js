@@ -8,6 +8,9 @@ module.exports = {
 	async execute(interaction) {
         let reply = ``;
 		if (global.games.has(interaction.guild.id)) {
+			if (! global.gameInfo.get(interaction.guild.id).length == 0){
+				reply = {content: `Game has already started! Wait for it to end!`, ephemeral : true};
+			} else {
             let gameUsers = global.games.get(interaction.guild.id);
             if (gameUsers.length < 3) {
                 const confirm = new ButtonBuilder()
@@ -35,7 +38,7 @@ module.exports = {
 				startGame(0, interaction.guild.id);
 				reply = `Game started, do /hand to see your hand!`;
 			}
-        } else {
+        }} else {
             reply = {content : `There is no game to start! You can start one by doing /join!`, ephemeral : true};
         }
 		const response = await interaction.reply(reply);

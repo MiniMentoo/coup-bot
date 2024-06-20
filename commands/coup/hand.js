@@ -41,5 +41,5 @@ function displayHand(userHand) {
     return {content: `${isIn}
 1: ${card1} 2: ${card2}
 You have ${coins} coins,
-You have ${revealed} revealed and unusable`, ephemeral : false} //set this to true after done testing
+You have lost ${revealed}`, ephemeral : false} //set this to true after done testing
 }

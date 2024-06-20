@@ -67,7 +67,8 @@ function shuffle(array) {
 
 function startGame(bonus, guildId) {
 	const quantity = 3 + bonus;
-	const cardType = ['captain', 'assassin', 'ambassador', 'duke', 'contessa'];
+	const cardType = ['captain <:captain:1253046137938509888>', 'assassin <:assassin:1253046154720051292>', 'ambassador <:ambassador:1253046167508488264>', 'duke <:duke:1253046100042973285>', 'contessa <:contessa:1253046118653231174>'
+];
 	let deck = [];
 	cardType.forEach(type => { 
 		for(let i = 0; i < quantity; i++){

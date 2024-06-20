@@ -16,7 +16,7 @@ module.exports = {
         let counter = 0;
         console.log(players);
         embed.addFields(
-            { name: 'Regular field title', value: 'Some value here' },
+            { name: 'Players', value: `${players}` },
             { name: '\u200B', value: '\u200B' });
         hands.forEach((hand) => addPlayerInfoToEmbed(counter, hand, players, embed));
         await interaction.reply({embeds : [embed]});

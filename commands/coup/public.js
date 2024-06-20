@@ -18,13 +18,14 @@ module.exports = {
         embed.addFields(
             { name: 'Players', value: `${players}` },
             { name: '\u200B', value: '\u200B' });
-        hands.forEach((hand) => addPlayerInfoToEmbed(counter, hand, players, embed));
+        hands.forEach((hand) => counter = addPlayerInfoToEmbed(counter, hand, players, embed));
         await interaction.reply({embeds : [embed]});
     },
 };
 
 function addPlayerInfoToEmbed(counter, hand, players, embed) { //want to add ping to each user, and show question marks for unrevealed cards, and relevant emoji for revealed cards, remember some type of coin display and isOut display
     let player = players[counter];
+    counter +=1;
     let unknown = '';
     if (hand[0][0] === ""){
         unkown += hand[2][0]; //assumes if slot in hand is empty, it's put into the revealed slot
@@ -48,4 +49,6 @@ function addPlayerInfoToEmbed(counter, hand, players, embed) { //want to add pin
         { name: `Still alive?`, value : `${alive}`, inline: true},
         { name: '\u200B', value: '\u200B' },
     )
+
+    return counter;
 }

@@ -7,6 +7,7 @@ module.exports = {
 		.setDescription('Starts the game and deals each player their cards.'),
 	async execute(interaction) {
         let reply = ``;
+		let doConfirm = false;
 		if (global.games.has(interaction.guild.id)) {
 			if (! global.gameInfo.get(interaction.guild.id).length == 0){
 				reply = {content: `Game has already started! Wait for it to end!`, ephemeral : true};
@@ -26,6 +27,7 @@ module.exports = {
                 const row = new ActionRowBuilder()
 			    .addComponents(cancel, confirm);
 
+				doConfirm = true;
                 reply = {
                     content: `You have less than 3 players in the game, are you sure you want to start?`,
                     components: [row],
@@ -43,19 +45,20 @@ module.exports = {
         }
 		const response = await interaction.reply(reply);
 		const collectorFilter = i => i.user.id === interaction.user.id;
-		try {
-			const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
-
-			if (confirmation.customId === 'confirm') {
-				startGame(0, interaction.guild.id);
-				await confirmation.update({ content: `Game started, do /hand to see your hand!`, components: [] });
-			} else if (confirmation.customId === 'cancel') {
-				await confirmation.update({ content: 'Action cancelled', components: [] });
+		if (doConfirm){
+			try {
+				const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
+				if (confirmation.customId === 'confirm') {
+					startGame(0, interaction.guild.id);
+					await confirmation.update({ content: `Game started, do /hand to see your hand!`, components: [] });
+				} else if (confirmation.customId === 'cancel') {
+					await confirmation.update({ content: 'Action cancelled', components: [] });
+				}
+			} catch (e) {
+				console.log(e);
+				await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling', components: [] });
 			}
-	} catch (e) {
-		console.log(e);
-		await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling', components: [] });
-	}
+		}
 	},
 };
 

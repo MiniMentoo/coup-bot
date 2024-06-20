@@ -1,4 +1,5 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
+const {cardType} = require('../../config.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -67,14 +68,13 @@ function shuffle(array) {
 
 function startGame(bonus, guildId) {
 	const quantity = 3 + bonus;
-	const cardType = ['captain <:captain:1253046137938509888>', 'assassin <:assassin:1253046154720051292>', 'ambassador <:ambassador:1253046167508488264>', 'duke <:duke:1253046100042973285>', 'contessa <:contessa:1253046118653231174>'
-];
+	const length = cardType.length;
 	let deck = [];
-	cardType.forEach(type => { 
-		for(let i = 0; i < quantity; i++){
-			deck.push(type); }
+	for(let i = 0; i < length; i++){
+		for(let j = 0; j < quantity; j++){
+			deck.push(i); 
 		}
-	);
+	}
 	deck = shuffle(deck);
 	let players = global.games.get(guildId);
 	let gameHands = global.hands.get(guildId);
@@ -82,7 +82,7 @@ function startGame(bonus, guildId) {
 		let hand = gameHands.get(player);
 		hand.push(deck.splice(0,2)); //the two cards drawn added to first position in hand
 		hand.push(2); //int representing number of coins second position
-		hand.push([]); //third position represents revealed (unusable) cards
+		hand.push(["",""]); //third position represents revealed (unusable) cards
 		hand.push(true); //bool representing if player is still in game
 	});
 	global.gameInfo.set(guildId, deck);

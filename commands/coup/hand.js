@@ -1,4 +1,6 @@
 const { SlashCommandBuilder, codeBlock} = require('discord.js');
+const {cardType, cardEmoji} = require('../../config.json');
+
 
 module.exports = {
     data : new SlashCommandBuilder()
@@ -31,7 +33,7 @@ function displayHand(userHand) {
     shown = userHand[2];
     let isIn ='';
     let revealed = shown;
-    if (! shown.length) {
+    if (shown[0] === "" && shown[1] === "") {
         revealed = 'no cards'
     }
     if (! userHand[3]) {
@@ -39,7 +41,7 @@ function displayHand(userHand) {
     }
 
     return {content: `${isIn}
-1: ${card1} 2: ${card2}
+1: ${cardType[card1]} ${cardEmoji[card1]} 2: ${cardType[card2]} ${cardEmoji[card2]}
 You have ${coins} coins,
 You have lost ${revealed}`, ephemeral : false} //set this to true after done testing
 }

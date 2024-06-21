@@ -8,6 +8,7 @@ module.exports = {
         .setDescription('takes your turn if it is your turn'),
     async execute(interaction) {
         let reply = "empty response";
+        let deployedButtons = false;
         if (global.games.has(interaction.guild.id)) {
             if (global.gameInfo.get(interaction.guild.id).length == 0) {
                 reply = {content: `Game has not started yet, do /start before taking your turn!`, ephemeral: true};
@@ -75,6 +76,7 @@ module.exports = {
                         {name : `${cardEmoji[0]} Steal`, value: `Claim captain to steal 2 coins from another player (blocked by ${cardEmoji[0]} & ${cardEmoji[2]})`},
                         {name : `${cardEmoji[2]} Exchange`, value: `Claim ambassador to draw 2 cards from court deck and swap as many of those as you want with the cards you have facedown (cannot be blocked)`},
                     )
+                    deployedButtons = true;
                     reply = {content: `${interaction.user} Click the reaction corresponding to the action you want to take. Remember anyone can challenge you if you claim a role!`, embeds : [embed], components : [row1, row2]}
                 } else {
                     reply = {content : `You are not the turn player! It's ${players[turn]} turn right now`, ephemeral : true};
@@ -84,5 +86,17 @@ module.exports = {
             reply = {content: `There is no game in this server yet, do /join to make and join one`, ephemeral: true};
         }
         await interaction.reply(reply);
+        if (deployedButtons) {
+            let players = global.games.get(interaction.guild.id);
+            let turn = global.turns.get(interaction.guild.id);
+            const collectorFilter = i => i.user.id === players[turn];
+            try {
+                const action = await response.awaitMessageComponent({ filter: collectorFilter, time: 180000 });
+            } catch(e) {
+                console.log(e);
+                await interaction.followUp({ content : `No choice taken in 3 minutes, timing out. Do /turn again to take your turn.`});
+            }
+
+        }
     },
 };

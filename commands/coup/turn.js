@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
 const {cardType, cardEmoji} = require('../../config.json');
 
 
@@ -15,6 +15,54 @@ module.exports = {
                 let players = global.games.get(interaction.guild.id);
                 let turn = global.turns.get(interaction.guild.id);
                 if (players[turn] == interaction.user) {
+                    const income = new ButtonBuilder()
+                    .setCustomId('income')
+                    .setLabel(`Income`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji('💰');
+
+                    const foreign = new ButtonBuilder()
+                    .setCustomId('foreignAid')
+                    .setLabel(`Foreign Aid`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji('🇺🇳');
+
+                    const coup = new ButtonBuilder()
+                    .setCustomId('coup')
+                    .setLabel(`Coup`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji('✊');
+
+                    const tax = new ButtonBuilder()
+                    .setCustomId('tax')
+                    .setLabel(`Tax`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji(cardEmoji[3]);
+
+                    const assassinate = new ButtonBuilder()
+                    .setCustomId('assassinate')
+                    .setLabel(`Assassinate`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji(cardEmoji[1]);
+
+                    const steal = new ButtonBuilder()
+                    .setCustomId('steal')
+                    .setLabel(`Steal`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji(cardEmoji[0]);
+
+                    const exchange = new ButtonBuilder()
+                    .setCustomId('exchange')
+                    .setLabel(`Exchange`)
+                    .setStyle(ButtonStyle.Primary)
+                    .setEmoji(cardEmoji[2]);
+
+                    const row1 = new ActionRowBuilder()
+                        .addComponents(income, foreign, coup);
+                    
+                    const row2 = new ActionRowBuilder()
+                        .addComponents(tax, assassinate, steal, exchange);
+
                     const embed = new EmbedBuilder()
                     .setTitle(players[turn].displayName + `'s turn`)
                     .setColor( 0xbebebb )
@@ -27,7 +75,7 @@ module.exports = {
                         {name : `${cardEmoji[0]} Steal`, value: `Claim captain to steal 2 coins from another player (blocked by ${cardEmoji[0]} & ${cardEmoji[2]})`},
                         {name : `${cardEmoji[2]} Exchange`, value: `Claim ambassador to draw 2 cards from court deck and swap as many of those as you want with the cards you have facedown (cannot be blocked)`},
                     )
-                    reply = {content: `${interaction.user} Click the reaction corresponding to the action you want to take. Remember anyone can challenge you if you claim a role!`, embeds : [embed]}
+                    reply = {content: `${interaction.user} Click the reaction corresponding to the action you want to take. Remember anyone can challenge you if you claim a role!`, embeds : [embed], components : [row1, row2]}
                 } else {
                     reply = {content : `You are not the turn player! It's ${players[turn]} turn right now`, ephemeral : true};
                 }

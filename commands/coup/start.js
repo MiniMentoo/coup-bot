@@ -13,6 +13,8 @@ module.exports = {
 				reply = {content: `Game has already started! Wait for it to end!`, ephemeral : true};
 			} else {
             let gameUsers = global.games.get(interaction.guild.id);
+			let turn = global.turns.get(interaction.guild.id);
+			let turnPlayer = gameUsers[turn];
             if (gameUsers.length < 3) {
                 const confirm = new ButtonBuilder()
 			    .setCustomId('confirm')
@@ -35,10 +37,12 @@ module.exports = {
 			} else if (gameUsers.length > 7) {
 				let bonus = Math.floor((gameUsers.length - 6)/2);
 				startGame(bonus, interaction.guild.id);
-				reply = `Game started with extra people, added ${bonus} extra copy of each card to deck, for a total of ${bonus + 3}. Do /hand to see your hand`;
+				reply = `Game started with extra people, added ${bonus} extra copy of each card to deck, for a total of ${bonus + 3}. Do /hand to see your hand
+${turnPlayer} it's your turn, do /turn to take it`;
 			} else {
 				startGame(0, interaction.guild.id);
-				reply = `Game started, do /hand to see your hand!`;
+				reply = `Game started, do /hand to see your hand!
+${turnPlayer} it's your turn, do /turn to take it`;
 			}
         }} else {
             reply = {content : `There is no game to start! You can start one by doing /join!`, ephemeral : true};
@@ -50,7 +54,11 @@ module.exports = {
 				const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
 				if (confirmation.customId === 'confirm') {
 					startGame(0, interaction.guild.id);
-					await confirmation.update({ content: `Game started, do /hand to see your hand!`, components: [] });
+					let gameUsers = global.games.get(interaction.guild.id);
+					let turn = global.turns.get(interaction.guild.id);
+					let turnPlayer = gameUsers[turn];
+					await confirmation.update({ content: `Game started, do /hand to see your hand!
+${turnPlayer} it's your turn, do /turn to take it`, components: [] });
 				} else if (confirmation.customId === 'cancel') {
 					await confirmation.update({ content: 'Action cancelled', components: [] });
 				}

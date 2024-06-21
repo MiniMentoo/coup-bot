@@ -26,6 +26,7 @@ current members:
         }} else {
             global.games.set(interaction.guild.id, []); 
             global.gameInfo.set(interaction.guild.id, []);
+            global.turns.set(interaction.guild.id, 0);
             global.hands.set(interaction.guild.id, new Map());
             let gameUsers = global.games.get(interaction.guild.id);
             gameUsers.push(interaction.user);

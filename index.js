@@ -7,6 +7,7 @@ const { token } = require('./config.json');
 global.games = new Map();
 global.gameInfo = new Map();
 global.hands = new Map();
+global.turns = new Map();
 
 
 // Create a new client instance

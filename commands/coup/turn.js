@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
 const {cardType, cardEmoji} = require('../../config.json');
+const { setTimeout } = require("timers/promises");
 
 
 module.exports = {
@@ -116,6 +117,26 @@ module.exports = {
             .setStyle(ButtonStyle.Primary)
             .setEmoji(cardEmoji[4]);
 
+            const noBlocksDisabled = new ButtonBuilder()
+            .setCustomId('noBlocks-disabled')
+            .setLabel('No Blocks / Challenges')
+            .setStyle(ButtonStyle.Secondary)
+            .setEmoji('✅')
+            .setDisabled(true);
+
+            const noBlocksEnabled = new ButtonBuilder()
+            .setCustomId('noBlocks-enabled')
+            .setLabel('No Blocks / Challenges')
+            .setStyle(ButtonStyle.Secondary)
+            .setEmoji('✅')
+            .setDisabled(false);
+
+            const challenge = new ButtonBuilder()
+            .setCustomId('challenge')
+            .setLabel('Challenge')
+            .setStyle(ButtonStyle.Danger)
+            .setEmoji('❌');
+
             try {
                 const action = await response.awaitMessageComponent({ filter: collectorFilter, time: 180000 });
                 switch(action.customId){
@@ -127,8 +148,13 @@ module.exports = {
                         break;
                     case 'foreignAid':
                         let row = new ActionRowBuilder()
-                            .addComponents(dukeBlock);
-                        await action.reply({content : `${players[turn]} is attempting to perform foreign aid, gaining 2 couins. Someone claiming duke can block this action!`, components: [row]});
+                            .addComponents(dukeBlock, noBlocksDisabled);
+                        let reply = `${players[turn]} is attempting to perform foreign aid, gaining 2 couins. Someone claiming duke can block this action!`
+                        await action.reply({content : reply, components: [row]});
+                        row = new ActionRowBuilder()
+                            .addComponents(dukeBlock, noBlocksEnabled);
+                        await setTimeout(5000);
+                        await action.editReply({content: reply, components :[row]});
                         break;
                     default:
                         await action.reply({content : `If you're seeing this, something has gone terribly wrong`});

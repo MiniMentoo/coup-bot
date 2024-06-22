@@ -13,10 +13,12 @@ module.exports = {
         .setThumbnail('https://imgur.com/fgo1Tls.png');
         const hands = global.hands.get(interaction.guild.id);
         const players = global.games.get(interaction.guild.id);
+        const turn = global.turns.get(interaction.guild.id);
         let counter = 0;
         console.log(players);
         embed.addFields(
-            { name: 'Players', value: `${players}` },
+            { name: 'Players', value: `${players}
+It's ${players[turn]}'s turn right now` },
             { name: '\u200B', value: '\u200B' });
         hands.forEach((hand) => counter = addPlayerInfoToEmbed(counter, hand, players, embed));
         await interaction.reply({embeds : [embed]});

@@ -36,13 +36,17 @@ async function loseInfluence(interaction, player) {
         
     } else {
         hand[3] = false; //the player is now out
+        let revealed;
         if (hand[0][0] == "") {
             hand[2][1] = hand[0][1];
+            hand[0][1] == "";
+            revealed = hand[2][1]
         } else {
             hand[2][0] = hand[0][0];
+            hand[0][0] == "";
+            revealed = hand[2][0];
         }
-        hand[0][0] == "";
-        hand[0][1] == "";
+        reply = `${player} is out of the game! They had ${cardType[revealed]} ${cardEmoji[revealed]}`
     }
     const response = await interaction.followUp(reply);
     if (deployedButtons) {

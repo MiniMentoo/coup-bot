@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
-const {cardType, cardEmoji} = require('../../config.json');
+const {cardType, cardEmoji, thinkingTime} = require('../../config.json');
 const { setTimeout } = require("timers/promises");
 
 
@@ -153,7 +153,7 @@ module.exports = {
                         await action.reply({content : reply, components: [row]});
                         row = new ActionRowBuilder()
                             .addComponents(dukeBlock, noBlocksEnabled);
-                        await setTimeout(5000);
+                        await setTimeout(thinkingTime);
                         await action.editReply({content: reply, components :[row]});
                         break;
                     default:

@@ -17,7 +17,7 @@ module.exports = {
                 } else {
                     reply = displayHand(userHand);}
             } else {
-                reply = {content : `You don't have a hand in this server yet, do /join and wait for the game to start!`, ephemeral : false};
+                reply = {content : `You don't have a hand in this server yet, do /join and wait for the game to start!`, ephemeral : true};
             }
         } else {
             reply = {content : `This server doesn't have a game yet! Try making one with /join`, ephemeral : true};

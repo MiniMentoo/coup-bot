@@ -54,7 +54,23 @@ module.exports = {
                     endTurn(action, interaction.guild.id, players);
                 } else if (action.customId == "dukeBlock") {
                     await action.update({components : []});
-                    await action.followUp({content : `${action.user} has blocked ${interaction.user}'s foreign aid action, anyone can challenge this!`})
+
+                    const challenge = new ButtonBuilder()
+                    .setCustomId('challenge')
+                    .setLabel('Challenge')
+                    .setStyle(ButtonStyle.Danger)
+                    .setEmoji('❌');
+
+                    const noBlocksEnabled = new ButtonBuilder()
+                    .setCustomId('noBlocks')
+                    .setLabel('No Blocks / Challenges')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setEmoji('✅')
+                    .setDisabled(false);
+
+                    let row = new ActionRowBuilder()
+                    .addComponents(challenge, noBlocksEnabled)
+                    await action.followUp({content : `${action.user} is claiming Duke ${cardEmoji[3]} and has blocked ${interaction.user}'s foreign aid action, anyone can challenge this!`, components : [row]})
                 }
             } catch (e) {
                 console.log(e);

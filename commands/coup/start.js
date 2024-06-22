@@ -71,16 +71,6 @@ ${turnPlayer} it's your turn, do /turn to take it`, components: [] });
 	},
 };
 
-function shuffle(array) {
-	deck = [...array];
-	len = deck.length;
-	for (let i = len -1; i > 0; i --) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[deck[i], deck[j]] = [deck[j], deck[i]];
-	}
-	return deck;
-}
-
 function startGame(bonus, guildId) {
 	const quantity = 3 + bonus;
 	const length = cardType.length;

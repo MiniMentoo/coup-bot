@@ -85,13 +85,17 @@ module.exports = {
         } else {
             reply = {content: `There is no game in this server yet, do /join to make and join one`, ephemeral: true};
         }
-        await interaction.reply(reply);
+        const response = await interaction.reply(reply);
         if (deployedButtons) {
             let players = global.games.get(interaction.guild.id);
             let turn = global.turns.get(interaction.guild.id);
-            const collectorFilter = i => i.user.id === players[turn];
+            const collectorFilter = i => i.user === players[turn];
             try {
                 const action = await response.awaitMessageComponent({ filter: collectorFilter, time: 180000 });
+                switch(action.customId){
+                    default:
+                        await action.reply({content : `If you're seeing this, something has gone terribly wrong`});
+                }
             } catch(e) {
                 console.log(e);
                 await interaction.followUp({ content : `No choice taken in 3 minutes, timing out. Do /turn again to take your turn.`});

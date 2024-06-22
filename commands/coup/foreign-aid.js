@@ -44,13 +44,17 @@ module.exports = {
             let players = global.games.get(interaction.guild.id);
             let turn = global.turns.get(interaction.guild.id);
             let hands = global.hands.get(interaction.guild.id);
+            const collectorFilter = i => players.includes(i.user);
 
             try {
-                const action = await response.awaitMessageComponent({ time: 180000 });
+                const action = await response.awaitMessageComponent({ filter: collectorFilter,time: 180000 });
                 if(action.customId == "noBlocks") {
                     hands.get(players[turn])[1] = hands.get(players[turn])[1] + 2;
                     await action.update({content: `Foreign Aid successfully performed! ${players[turn]} has gained 2 coins and now has ${hands.get(players[turn])[1]} coins.`, components : []});
                     endTurn(action, interaction.guild.id, players);
+                } else if (action.customId == "dukeBlock") {
+                    await action.update({components : []});
+                    await action.followUp({content : `${action.user} has blocked ${interaction.user}'s foreign aid action, anyone can challenge this!`})
                 }
             } catch (e) {
                 console.log(e);

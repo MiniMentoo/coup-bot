@@ -91,6 +91,31 @@ module.exports = {
             let turn = global.turns.get(interaction.guild.id);
             let hands = global.hands.get(interaction.guild.id);
             const collectorFilter = i => i.user === players[turn];
+
+            const dukeBlock = new ButtonBuilder()
+            .setCustomId('dukeBlock')
+            .setLabel(`Block with Duke`)
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji(cardEmoji[3]);
+
+            const captainBlock = new ButtonBuilder()
+            .setCustomId('captainBlock')
+            .setLabel(`Block with Captain`)
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji(cardEmoji[0]);
+
+            const ambassadorBlock = new ButtonBuilder()
+            .setCustomId('ambassadorBlock')
+            .setLabel(`Block with Ambassador`)
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji(cardEmoji[2]);
+
+            const contessaBlock = new ButtonBuilder()
+            .setCustomId('contessaBlock')
+            .setLabel(`Block with Contessa`)
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji(cardEmoji[4]);
+
             try {
                 const action = await response.awaitMessageComponent({ filter: collectorFilter, time: 180000 });
                 switch(action.customId){
@@ -98,10 +123,16 @@ module.exports = {
                         hands.get(players[turn])[1] = hands.get(players[turn])[1] + 1;
                         await interaction.deleteReply();
                         await action.reply({content: `${players[turn]} did income and gained one coin, they now have ${hands.get(players[turn])[1]} coins`})
+                        endTurn(action, interaction.guild.id, players);
+                        break;
+                    case 'foreignAid':
+                        let row = new ActionRowBuilder()
+                            .addComponents(dukeBlock);
+                        await action.reply({content : `${players[turn]} is attempting to perform foreign aid, gaining 2 couins. Someone claiming duke can block this action!`, components: [row]});
                         break;
                     default:
                         await action.reply({content : `If you're seeing this, something has gone terribly wrong`});
-                }
+                }                
             } catch(e) {
                 console.log(e);
                 await interaction.followUp({ content : `No choice taken in 3 minutes, timing out. Do /turn again to take your turn.`});
@@ -109,3 +140,9 @@ module.exports = {
         }
     },
 };
+
+function endTurn(action, serverId, players) {
+    let turn = (global.turns.get(serverId) + 1) % players.length;
+    global.turns.set(serverId, turn);
+    action.followUp({content: `${players[turn]} it's your turn, do /turn to take it`});
+}

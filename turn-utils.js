@@ -1,5 +1,5 @@
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
-const { cardType, cardEmoji } = require('./config.json');
+const { cardType, cardEmoji, thinkingTime } = require('./config.json');
 
 
 function endTurn(action, serverId, players) {
@@ -8,8 +8,63 @@ function endTurn(action, serverId, players) {
     action.followUp({content: `${players[turn]} it's your turn, do /turn to take it`});
 }
 
-function performChallenge(interaction, ) {
+async function performChallenge(interaction, challenger, challengee, card) {
+    const giveUp = new ButtonBuilder()
+        .setCustomId('giveUp')
+        .setLabel(`Don't reveal (lose challenge)`)
+        .setStyle(ButtonStyle.Danger)
+        .setEmoji('💀');
+    
+    const reveal = new ButtonBuilder()
+        .setCustomId('reveal')
+        .setLabel(`Reveal a ${cardType[card]}`)
+        .setStyle(ButtonStyle.Success)
+        .setEmoji('✋');
 
+    const row = new ActionRowBuilder()
+        .addComponents(giveUp, reveal);
+    
+    const response = await interaction.followUp({content: `${challenger} is challenging ${challengee}'s claim that they hold a ${cardType[card]} ${cardEmoji[card]}the loser of this challenge will lose influence!
+${challengee} choose to either forfeit the challenge (losing an influence) or reveal the card (fails unless you hold the ${cardType[card]} ${cardEmoji[card]})
+If you successfully reveal a ${cardType[card]} then it will be put back into the deck and you will draw a random card`, components : [row]});
+    
+    const collectorFilter = i => i.user === challengee;
+    try {
+        const hand = global.hands.get(interaction.guild.id).get(challengee);
+        const deck = global.gameInfo.get(interaction.guild.id);
+        let reply2 = "";
+        const choice = await response.awaitMessageComponent({ filter: collectorFilter, time: thinkingTime });
+        let loser;
+        if (choice.customId == "giveUp") {
+            await choice.reply(`${challengee} has refused to reveal the ${cardType[card]} and failed the challenge`);
+            loser = challengee;
+        } else {
+            if (hand[0][0] == card) {
+                deck.push(hand[0][0]);
+                shuffle(deck);
+                hand[0][0] = deck.splice(0,1);
+                loser = challenger;
+                reply2 = `${challengee} has revealed the ${cardType[card]} ${cardEmoji[card]} and won the challenge. The card has been put into the deck and a new one was drawn at random.
+${challenger} has lost the challenge and will lose an influence.`
+            } else if (hand[0][1] == card) {
+                deck.push(hand[0][1]);
+                shuffle(deck);
+                hand[0][1] = deck.splice(0,1);
+                loser = challenger;
+                reply2 = `${challengee} has revealed the ${cardType[card]} ${cardEmoji[card]} and won the challenge. The card has been put into the deck and a new one was drawn at random.
+${challenger} has lost the challenge and will lose an influence.`;
+            } else {
+                loser = challengee;
+                reply2 = `${challengee} could not reveal the ${cardType[card]} ${cardEmoji[card]} and has failed the challenge.`;
+            }
+            await choice.reply(reply2);
+            await loseInfluence(choice, loser);
+        }
+    } catch(e) {
+        console.log(e);
+        await interaction.followUp(`${challengee} failed to respond, they failed the challenge automatically`);
+        await loseInfluence(interaction, challengee);
+    }
 }
 
 async function loseInfluence(interaction, player) {
@@ -54,7 +109,7 @@ async function loseInfluence(interaction, player) {
         try {
             let hand = global.hands.get(interaction.guild.id).get(player);
             let reply2 = "";
-            const choice = await response.awaitMessageComponent({ filter: collectorFilter, time: 3000000 });
+            const choice = await response.awaitMessageComponent({ filter: collectorFilter, time: thinkingTime });
             if (choice.customId == "one") {
                 hand[2][0] = hand[0][0];
                 hand[0][0] = "";
@@ -67,12 +122,25 @@ async function loseInfluence(interaction, player) {
             await interaction.followUp(reply2);
         } catch (e) {
             console.log(e)
-
+            hand[2][0] = hand[0][0];
+            hand[0][0] = "";
+            await interaction.followUp(`${player} has failed to respond, revealed the ${cardType[hand[2][0]]} ${cardEmoji[hand[2][0]]}, they have 1 card left hidden!`);
         }
     }
 }
 
+function shuffle(deck) {
+	len = deck.length;
+	for (let i = len -1; i > 0; i --) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[deck[i], deck[j]] = [deck[j], deck[i]];
+	}
+	return deck;
+}
 
 module.exports = {
-    endTurn
+    endTurn,
+    loseInfluence,
+    performChallenge,
+    shuffle
 };

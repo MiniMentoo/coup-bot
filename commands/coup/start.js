@@ -1,5 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const {cardType} = require('../../config.json');
+const {shuffle} = require('../../turn-utils.js')
 
 module.exports = {
 	data: new SlashCommandBuilder()

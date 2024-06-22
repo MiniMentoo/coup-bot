@@ -89,10 +89,16 @@ module.exports = {
         if (deployedButtons) {
             let players = global.games.get(interaction.guild.id);
             let turn = global.turns.get(interaction.guild.id);
+            let hands = global.hands.get(interaction.guild.id);
             const collectorFilter = i => i.user === players[turn];
             try {
                 const action = await response.awaitMessageComponent({ filter: collectorFilter, time: 180000 });
                 switch(action.customId){
+                    case 'income':
+                        hands.get(players[turn])[1] = hands.get(players[turn])[1] + 1;
+                        await interaction.deleteReply();
+                        await action.reply({content: `${players[turn]} did income and gained one coin, they now have ${hands.get(players[turn])[1]} coins`})
+                        break;
                     default:
                         await action.reply({content : `If you're seeing this, something has gone terribly wrong`});
                 }
@@ -100,7 +106,6 @@ module.exports = {
                 console.log(e);
                 await interaction.followUp({ content : `No choice taken in 3 minutes, timing out. Do /turn again to take your turn.`});
             }
-
         }
     },
 };

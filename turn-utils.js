@@ -58,8 +58,8 @@ ${challenger} has lost the challenge and will lose an influence.`;
                 reply2 = `${challengee} could not reveal the ${cardType[card]} ${cardEmoji[card]} and has failed the challenge.`;
             }
             await choice.reply(reply2);
-            await loseInfluence(choice, loser);
         }
+        await loseInfluence(choice, loser);
     } catch(e) {
         console.log(e);
         await interaction.followUp(`${challengee} failed to respond, they failed the challenge automatically`);
@@ -71,7 +71,8 @@ async function loseInfluence(interaction, player) {
     let hand = global.hands.get(interaction.guild.id).get(player);
     let reply = "empty";
     let deployedButtons = false;
-    if (hand[0][0] != "" && hand[0][1] != "") {
+    console.log(hand);
+    if ((hand[0][0] != -1) && (hand[0][1] != -1)) {
         const one = new ButtonBuilder()
             .setCustomId("one")
             .setLabel("lose the first card")
@@ -87,18 +88,19 @@ async function loseInfluence(interaction, player) {
         const row = new ActionRowBuilder()
             .addComponents(one, two);
         
+        deployedButtons = true;
         reply = {content : `${player} You're losing one influence, please press the button corresponding to which card you want to reveal, and lose influence of (you can do /hand to privately see your own hand).`, components: [row]};
         
     } else {
         hand[3] = false; //the player is now out
         let revealed;
-        if (hand[0][0] == "") {
+        if (hand[0][0] == -1) {
             hand[2][1] = hand[0][1];
-            hand[0][1] == "";
+            hand[0][1] == -1;
             revealed = hand[2][1]
         } else {
             hand[2][0] = hand[0][0];
-            hand[0][0] == "";
+            hand[0][0] == -1;
             revealed = hand[2][0];
         }
         reply = `${player} is out of the game! They had ${cardType[revealed]} ${cardEmoji[revealed]}`
@@ -112,19 +114,19 @@ async function loseInfluence(interaction, player) {
             const choice = await response.awaitMessageComponent({ filter: collectorFilter, time: thinkingTime });
             if (choice.customId == "one") {
                 hand[2][0] = hand[0][0];
-                hand[0][0] = "";
+                hand[0][0] = -1;
                 reply2 = `${player} has revealed the ${cardType[hand[2][0]]} ${cardEmoji[hand[2][0]]}, they have 1 card left hidden!`
             } else {
                 hand[2][1] = hand[0][1];
-                hand[0][1] = "";
+                hand[0][1] = -1;
                 reply2 = `${player} has revealed the ${cardType[hand[2][1]]} ${cardEmoji[hand[2][1]]}, they have 1 card left hidden!`
             }
-            await interaction.followUp(reply2);
+            await choice.reply(reply2);
         } catch (e) {
             console.log(e)
             hand[2][0] = hand[0][0];
-            hand[0][0] = "";
-            await interaction.followUp(`${player} has failed to respond, revealed the ${cardType[hand[2][0]]} ${cardEmoji[hand[2][0]]}, they have 1 card left hidden!`);
+            hand[0][0] = -1;
+            await choice.reply(`${player} has failed to respond, revealed the ${cardType[hand[2][0]]} ${cardEmoji[hand[2][0]]}, they have 1 card left hidden!`);
         }
     }
 }

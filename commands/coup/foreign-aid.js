@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
-const {endTurn} = require('../../turn-utils.js');
+const {endTurn, performChallenge} = require('../../turn-utils.js');
 const {cardType, cardEmoji, thinkingTime} = require('../../config.json');
 
 module.exports = {
@@ -47,7 +47,7 @@ module.exports = {
             const collectorFilter = i => players.includes(i.user);
 
             try {
-                const action = await response.awaitMessageComponent({ filter: collectorFilter,time: 180000 });
+                const action = await response.awaitMessageComponent({ filter: collectorFilter,time: thinkingTime });
                 if(action.customId == "noBlocks") {
                     hands.get(players[turn])[1] = hands.get(players[turn])[1] + 2;
                     await action.update({content: `Foreign Aid successfully performed! ${players[turn]} has gained 2 coins and now has ${hands.get(players[turn])[1]} coins.`, components : []});
@@ -70,7 +70,21 @@ module.exports = {
 
                     let row = new ActionRowBuilder()
                     .addComponents(challenge, noBlocksEnabled)
-                    await action.followUp({content : `${action.user} is claiming Duke ${cardEmoji[3]} and has blocked ${interaction.user}'s foreign aid action, anyone can challenge this!`, components : [row]})
+                    const challenging = await action.followUp({content : `${action.user} is claiming Duke ${cardEmoji[3]} and has blocked ${interaction.user}'s foreign aid action, anyone can challenge this!`, components : [row]})
+                    try {
+                        const choice = await challenging.awaitMessageComponent({ filter: collectorFilter, time: thinkingTime });
+                        if (choice.customId == "noBlocks") {
+                            await choice.reply(`Foreign Aid successfully blocked, no challenges`)
+                            endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
+                        } else {
+                            await choice.reply(`${choice.user} has challenged ${action.user}`);
+                            await performChallenge(choice, choice.user, action.user, 3);
+                        }
+                    } catch(e) {
+                        console.log(e);
+                        await choice.reply(`Foreign Aid successfully blocked, no challenges before timeout`)
+                        endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
+                    }
                 }
             } catch (e) {
                 console.log(e);

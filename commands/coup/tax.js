@@ -45,6 +45,7 @@ module.exports = {
             const collectorFilter = i => players.includes(i.user);
             try {
                 const action = await response.awaitMessageComponent({ filter: collectorFilter,time: thinkingTime });
+                await interaction.editReply({components: []});
                 if(action.customId == "noBlocks") {
                     hands.get(players[turn])[1] = hands.get(players[turn])[1] + 3;
                     await action.update({content: `Tax successfully performed! ${players[turn]} has gained 3 coins and now has ${hands.get(players[turn])[1]} coins.`, components : []});

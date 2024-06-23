@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { cardEmoji } = require('../../config.json');
 
 
 module.exports = {
@@ -29,13 +30,13 @@ function addPlayerInfoToEmbed(counter, hand, players, embed) { //want to add pin
     let player = players[counter];
     counter +=1;
     let unknown = '';
-    if (hand[0][0] === ""){
-        unkown += hand[2][0]; //assumes if slot in hand is empty, it's put into the revealed slot
+    if (hand[0][0] == -1){
+        unknown += cardEmoji[hand[2][0]]; //assumes if slot in hand is empty, it's put into the revealed slot
     } else {
         unknown += "❓";
     }
-    if (hand[0][1] === ""){
-        unknown += hand[2][1];
+    if (hand[0][1] == -1){
+        unknown += cardEmoji[hand[2][1]];
     } else {
         unknown += "❓";
     }

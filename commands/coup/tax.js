@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
 const {endTurn, performChallenge} = require('../../turn-utils.js');
 const {cardType, cardEmoji, thinkingTime} = require('../../config.json');
 
@@ -51,13 +51,13 @@ module.exports = {
                     endTurn(action, interaction.guild.id, players);
                 } else if (action.customId == "challenge") {
                     await action.reply(`${action.user} has challenged ${interaction.user}`);
-                    await performChallenge(choice, action.user, interaction.user, 3);
+                    await performChallenge(action, action.user, interaction.user, 3);
                 }
             } catch (e) {
                 console.log(e);
                 hands.get(players[turn])[1] = hands.get(players[turn])[1] + 3;
                 await interaction.update({content: `Thinking time timed out, Tax successfully performed! ${players[turn]} has gained 3 coins and now has ${hands.get(players[turn])[1]} coins.`, components : []});
-            }
+            } 
         }       
     }
 };

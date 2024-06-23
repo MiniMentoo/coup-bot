@@ -87,7 +87,7 @@ function startGame(bonus, guildId) {
 		let hand = gameHands.get(player);
 		hand.push(deck.splice(0,2)); //the two cards drawn added to first position in hand
 		hand.push(2); //int representing number of coins second position
-		hand.push(["",""]); //third position represents revealed (unusable) cards
+		hand.push([-1,-1]); //third position represents revealed (unusable) cards
 		hand.push(true); //bool representing if player is still in game
 	});
 	global.gameInfo.set(guildId, deck);

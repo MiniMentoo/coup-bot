@@ -27,21 +27,34 @@ module.exports = {
 };
 
 function displayHand(userHand) {
-    card1 = userHand[0][0];
-    card2 = userHand[0][1];
+    card1 = '❌';
+    card2 = '❌';
     coins = userHand[1];
     shown = userHand[2];
+    hidden = userHand[0];
     let isIn ='';
-    let revealed = shown;
-    if (shown[0] === "" && shown[1] === "") {
+    let revealed = '';
+    if (shown[0] == -1 && shown[1] == -1) {
         revealed = 'no cards'
+    } else {
+        if(shown[0] != -1) {
+            revealed += cardEmoji[shown[0]];
+        }
+        if (shown[1] != -1) {
+            revealed += cardEmoji[shown[1]];
+        }
     }
     if (! userHand[3]) {
         isIn = "You're out of the game :(";
     }
-
+    if (hidden[0] != -1) {
+        card1 = `${cardType[hidden[0]]} ${cardEmoji[hidden[0]]}`;
+    }
+    if (hidden[1] != -1) {
+        card2 = `${cardType[hidden[1]]} ${cardEmoji[hidden[1]]}`;
+    }
     return {content: `${isIn}
-1: ${cardType[card1]} ${cardEmoji[card1]} 2: ${cardType[card2]} ${cardEmoji[card2]}
+1: ${card1} 2: ${card2}
 You have ${coins} coins,
 You have lost ${revealed}`, ephemeral : false} //set this to true after done testing
 }

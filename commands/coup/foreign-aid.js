@@ -75,10 +75,11 @@ module.exports = {
                         const choice = await challenging.awaitMessageComponent({ filter: collectorFilter, time: thinkingTime });
                         if (choice.customId == "noBlocks") {
                             await choice.reply(`Foreign Aid successfully blocked, no challenges`)
-                            endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
+                            await endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
                         } else {
                             await choice.reply(`${choice.user} has challenged ${action.user}`);
                             await performChallenge(choice, choice.user, action.user, 3);
+                            await endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
                         }
                     } catch(e) {
                         console.log(e);

@@ -26,7 +26,7 @@ module.exports = {
 
         await interaction.reply(reply);
         if (deployedAction) {
-            endTurn(interaction, interaction.guild.id, global.games.get(interaction.guild.id));
+            await endTurn(interaction, interaction.guild.id, global.games.get(interaction.guild.id));
         }
     }       
 };

@@ -49,10 +49,11 @@ module.exports = {
                 if(action.customId == "noBlocks") {
                     hands.get(players[turn])[1] = hands.get(players[turn])[1] + 3;
                     await action.update({content: `Tax successfully performed! ${players[turn]} has gained 3 coins and now has ${hands.get(players[turn])[1]} coins.`, components : []});
-                    endTurn(action, interaction.guild.id, players);
+                    await endTurn(action, interaction.guild.id, players);
                 } else if (action.customId == "challenge") {
                     await action.reply(`${action.user} has challenged ${interaction.user}`);
                     await performChallenge(action, action.user, interaction.user, 3);
+                    await endTurn(action, interaction.guild.id, players);
                 }
             } catch (e) {
                 console.log(e);

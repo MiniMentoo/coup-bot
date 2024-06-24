@@ -126,7 +126,7 @@ async function loseInfluence(interaction, player) {
             console.log(e)
             hand[2][0] = hand[0][0];
             hand[0][0] = -1;
-            await choice.reply(`${player} has failed to respond, revealed the ${cardType[hand[2][0]]} ${cardEmoji[hand[2][0]]}, they have 1 card left hidden!`);
+            await interaction.followUp(`${player} has failed to respond, revealed the ${cardType[hand[2][0]]} ${cardEmoji[hand[2][0]]}, they have 1 card left hidden!`);
         }
     }
 }

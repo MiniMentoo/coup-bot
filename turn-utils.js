@@ -75,21 +75,21 @@ async function loseInfluence(interaction, player) {
     if ((hand[0][0] != -1) && (hand[0][1] != -1)) {
         const one = new ButtonBuilder()
             .setCustomId("one")
-            .setLabel(`lose the ${cardType[hand[0][0]]}`)
+            .setLabel(`lose the first card`)
             .setStyle(ButtonStyle.Secondary)
-            .setEmoji(`${cardEmoji[hand[0][0]]}`);
+            .setEmoji(`1️⃣`);
         
         const two = new ButtonBuilder()
             .setCustomId("two")
-            .setLabel(`lose the ${cardType[hand[0][1]]}`)
+            .setLabel(`lose the second card`)
             .setStyle(ButtonStyle.Secondary)
-            .setEmoji(`${cardEmoji[hand[0][1]]}`);
+            .setEmoji(`2️⃣`);
 
         const row = new ActionRowBuilder()
             .addComponents(one, two);
         
         deployedButtons = true;
-        reply = {content : `${player} You're losing one influence, please press the button corresponding to which card you want to reveal, and lose influence of (you can do /hand to privately see your own hand).`, components: [row], ephemeral : true};
+        reply = {content : `${player} You're losing one influence, please press the button corresponding to which card you want to reveal, and lose influence of (you can do /hand to privately see your own hand).`, components: [row], ephemeral : false};
         
     } else {
         hand[3] = false; //the player is now out

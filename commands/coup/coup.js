@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {endTurn} = require('../../turn-utils.js');
+const {endTurn, loseInfluence} = require('../../turn-utils.js');
 const {cardType, cardEmoji, thinkingTime} = require('../../config.json');
 
 module.exports = {
@@ -13,7 +13,7 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         let reply = 'empty';
-        let deployedButtons = false;
+        let deployedAction = false;
         const target = interaction.options.getUser('target');
         if (global.games.has(interaction.guild.id) && (!global.gameInfo.get(interaction.guild.id).length == 0)){
             let players = global.games.get(interaction.guild.id);
@@ -22,7 +22,10 @@ module.exports = {
             if (interaction.user == players[turn]) {
                 if (players.includes(target) && hands.get(target)[3]) {
                     if (hands.get(interaction.user)[1] >= 7) {
-
+                        deployedAction = true;
+                        hands.get(players[turn])[1] = hands.get(players[turn])[1] - 7;
+                        reply = {content: `${interaction.user} has spent 7 coins and performed a coup on ${target}
+They now have ${hands.get(interaction.user)[1]} coins.`}
                     } else {
                         reply = {content : `A Coup requires 7 coins, and you only have ${hands.get(interaction.user)[1]}`, ephemeral : true};
                     }
@@ -37,5 +40,9 @@ module.exports = {
         }
 
         await interaction.reply(reply);
+        if (deployedAction){
+            await loseInfluence(interaction, target);
+            await endTurn(interaction, interaction.guild.id, global.games.get(interaction.guild.id));
+        }
     }       
 };

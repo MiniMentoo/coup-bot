@@ -52,7 +52,12 @@ module.exports = {
                     await endTurn(action, interaction.guild.id, players);
                 } else if (action.customId == "challenge") {
                     await action.reply(`${action.user} has challenged ${interaction.user}`);
-                    await performChallenge(action, action.user, interaction.user, 3);
+                    if (! await performChallenge(action, action.user, interaction.user, 3)) {
+                        hands.get(players[turn])[1] = hands.get(players[turn])[1] + 3;
+                        await action.followUp({content: `Tax successfully performed! ${players[turn]} has gained 3 coins and now has ${hands.get(players[turn])[1]} coins.`, components : []});
+                    } else {
+                        await action.followUp(`Tax action failed as the challenge succeeded, turn passed.`)
+                    }
                     await endTurn(action, interaction.guild.id, players);
                 }
             } catch (e) {

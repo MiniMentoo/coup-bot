@@ -35,15 +35,18 @@ If you successfully reveal a ${cardType[card]} then it will be put back into the
         let reply2 = "";
         const choice = await response.awaitMessageComponent({ filter: collectorFilter, time: thinkingTime });
         let loser;
+        let challengeSuccessful;
         if (choice.customId == "giveUp") {
             await choice.reply(`${challengee} has refused to reveal the ${cardType[card]} and failed the challenge`);
             loser = challengee;
+            challengeSuccessful = true;
         } else {
             if (hand[0][0] == card) {
                 deck.push(hand[0][0]);
                 shuffle(deck);
                 hand[0][0] = deck.splice(0,1);
                 loser = challenger;
+                challengeSuccessful = false;
                 reply2 = `${challengee} has revealed the ${cardType[card]} ${cardEmoji[card]} and won the challenge. The card has been put into the deck and a new one was drawn at random.
 ${challenger} has lost the challenge and will lose an influence.`
             } else if (hand[0][1] == card) {
@@ -51,19 +54,23 @@ ${challenger} has lost the challenge and will lose an influence.`
                 shuffle(deck);
                 hand[0][1] = deck.splice(0,1);
                 loser = challenger;
+                challengeSuccessful = false;
                 reply2 = `${challengee} has revealed the ${cardType[card]} ${cardEmoji[card]} and won the challenge. The card has been put into the deck and a new one was drawn at random.
 ${challenger} has lost the challenge and will lose an influence.`;
             } else {
                 loser = challengee;
+                challengeSuccessful = true;
                 reply2 = `${challengee} could not reveal the ${cardType[card]} ${cardEmoji[card]} and has failed the challenge.`;
             }
             await choice.reply(reply2);
         }
         await loseInfluence(choice, loser);
+        return challengeSuccessful;
     } catch(e) {
         console.log(e);
         await interaction.followUp(`${challengee} failed to respond, they failed the challenge automatically`);
         await loseInfluence(interaction, challengee);
+        return true;
     }
 }
 

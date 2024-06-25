@@ -61,10 +61,72 @@ They now have ${hands.get(interaction.user)[1]} coins. This action can be challe
             reply = {content : `There either isn't a game in this server, or it hasn't been /start 'ed yet`, ephemeral : true};
         }
 
-        await interaction.reply(reply);
+        const response = await interaction.reply(reply);
         if (deployedAction){
-            await loseInfluence(interaction, target);
-            await endTurn(interaction, interaction.guild.id, global.games.get(interaction.guild.id));
+            let hands = global.hands.get(interaction.guild.id);
+            let players = global.games.get(interaction.guild.id);
+            let turn = global.turns.get(interaction.guild.id);
+            const collectorFilter = i => players.includes(i.user);
+            try {
+                const action = await response.awaitMessageComponent({filter : collectorFilter, time: thinkingTime});
+                await interaction.editReply({components : []});
+                if (action.customId == "noBlocks") {
+                    await action.reply({content : `No blocks! Assassination going forward`});
+                    await loseInfluence(action, target);
+                } else if (action.customId == "challenge") {
+                    await action.reply(`${action.user} has challenged ${interaction.user}`);
+                    if(! await performChallenge(action, action.user, interaction.user, 1)) {
+                        await action.followUp(`Challenge failed, assassination going forward.`);
+                        loseInfluence(action, target);
+                    } else {
+                        hands.get(players[turn])[1] = hands.get(players[turn])[1] + 3;
+                        await action.followUp(`Assassination failed as challenge succeeded. Coins have been refunded, ${players[turn]} now has ${hands.get(players[turn])[1]} coins.`);
+                    }
+                } else {
+                    await action.update({components : []});
+
+                    const challenge = new ButtonBuilder()
+                    .setCustomId('challenge')
+                    .setLabel('Challenge')
+                    .setStyle(ButtonStyle.Danger)
+                    .setEmoji('❌');
+
+                    const noBlocksEnabled = new ButtonBuilder()
+                    .setCustomId('noBlocks')
+                    .setLabel('No Blocks / Challenges')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setEmoji('✅')
+                    .setDisabled(false);
+
+                    let row = new ActionRowBuilder()
+                    .addComponents(challenge, noBlocksEnabled)
+                    const challenging = await action.followUp({content : `${action.user} is claiming Contessa ${cardEmoji[4]} and has blocked ${interaction.user}'s assassination, anyone can challenge this!`, components : [row]})
+                    try {
+                        const choice = await challenging.awaitMessageComponent({ filter: collectorFilter, time: thinkingTime });
+                        if (choice.customId == "noBlocks") {
+                            await choice.reply(`Assassination successfully blocked, no challenges`)
+                        } else {
+                            await choice.reply(`${choice.user} has challenged ${action.user}`);
+                            if (await performChallenge(choice, choice.user, action.user, 4)) {
+                                await choice.followUp({content:`Challenge succeeded, Contessa block fails, assassination goes through!`, components : []});
+                                await loseInfluence(choice, target);
+                            } else {
+                                await choice.followUp(`Challenge failed, Contessa block remains. Turn passes.`)
+                            }
+                        }
+                    } catch(e) {
+                        console.log(e);
+                        await choice.reply(`Assassination successfully blocked, no challenges before timeout`)
+                        endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
+                    }
+                }
+                await endTurn(action, interaction.guild.id, global.games.get(interaction.guild.id));
+            } catch (e) {
+                console.log(e);
+                await interaction.update(`Thinking time timed out. Assassination going through!`);
+                await loseInfluence(interaction, target);
+                await endTurn(interaction, interaction.guild.id, global.games.get(interaction.guild.id));
+            }
         }
     }       
 };

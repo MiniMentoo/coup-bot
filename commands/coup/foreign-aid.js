@@ -78,7 +78,12 @@ module.exports = {
                             await endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
                         } else {
                             await choice.reply(`${choice.user} has challenged ${action.user}`);
-                            await performChallenge(choice, choice.user, action.user, 3);
+                            if (await performChallenge(choice, choice.user, action.user, 3)) {
+                                hands.get(players[turn])[1] = hands.get(players[turn])[1] + 2;
+                                await choice.followUp({content: `Foreign Aid successfully performed! ${players[turn]} has gained 2 coins and now has ${hands.get(players[turn])[1]} coins.`, components : []});
+                            } else {
+                                await choice.followUp(`Foreign Aid successfully blocked, challenge failed.`)
+                            }
                             await endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
                         }
                     } catch(e) {

@@ -52,7 +52,7 @@ module.exports = {
                             .addComponents(challenge, captainBlock, ambassadorBlock, noBlocks);
                         
                         reply = {content: `${interaction.user} is attempting to steal 2 coins from ${target}
-They will have ${hands.get(interaction.user)[1]} coins if this goes through. This action can be challenged by anyone or blocked with Captain / Ambassador.`, components : [row]};
+They will have ${hands.get(interaction.user)[1] + 2} coins if this goes through. This action can be challenged by anyone or blocked with Captain / Ambassador.`, components : [row]};
                     } else {
                         reply = {content: `${target} doesn't have enough money to be stolen from, try someone else!`, ephemeral : true};
                     }
@@ -66,6 +66,38 @@ They will have ${hands.get(interaction.user)[1]} coins if this goes through. Thi
             reply = {content : `There either isn't a game in this server, or it hasn't been /start 'ed yet`, ephemeral : true};
         }
 
-        await interaction.reply(reply);
+        const response = await interaction.reply(reply);
+        if (deployedButtons){
+            let hands = global.hands.get(interaction.guild.id);
+            let players = global.games.get(interaction.guild.id);
+            let turn = global.turns.get(interaction.guild.id);
+            const collectorFilter = i => players.includes(i.user);
+            try {
+                const action = await response.awaitMessageComponent({filter : collectorFilter, time: thinkingTime});
+                await interaction.editReply({components : []});
+                if (action.customId == "noBlocks") {
+                    hands.get(players[turn])[1] = hands.get(players[turn])[1] + 2;
+                    hands.get(target)[1] = hands.get(target)[1] - 2;
+                    await action.update({content: `Steal successfully performed! ${players[turn]} has gained 2 coins and now has ${hands.get(players[turn])[1]} coins.
+${target} has lost 2 coins and now has ${hands.get(target)[1]} coins`, components : []});
+                    await endTurn(action, interaction.guild.id, players);
+                } else if (action.customId == "challenge") {
+                    await action.reply(`${action.user} has challenged ${interaction.user}`);
+                    if(! await performChallenge(action, action.user, interaction.user, 0)) {
+                        hands.get(players[turn])[1] = hands.get(players[turn])[1] + 2;
+                        hands.get(target)[1] = hands.get(target)[1] - 2;
+                        await action.followUp({content: `Steal successfully performed! ${players[turn]} has gained 2 coins and now has ${hands.get(players[turn])[1]} coins.
+${target} has lost 2 coins and now has ${hands.get(target)[1]} coins`, components : []});
+                    } else {
+                        await action.followUp(`Steal failed as challenge succeeded.`);
+                    }
+                    await endTurn(action, interaction.guild.id, players);
+                }
+            } catch(e) {
+                console.log(e);
+                await choice.reply(`Assassination successfully blocked, no challenges before timeout`)
+                endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
+            }
+        }
     }       
 };

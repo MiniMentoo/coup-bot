@@ -130,6 +130,29 @@ ${target} has lost 2 coins and now has ${hands.get(target)[1]} coins`, component
                         console.log(e);
                         await choice.reply(`Steal successfully blocked, no challenges before timeout`)
                     }
+                } else if (action.customId == "ambassadorBlock") {
+                    await action.update({components : []});
+
+                    const challenging = await action.followUp({content : `${action.user} is claiming Ambassador ${cardEmoji[2]} and has blocked ${interaction.user}'s steal, anyone can challenge this!`, components : [row]})
+                    try {
+                        const choice = await challenging.awaitMessageComponent({ filter: collectorFilter, time: thinkingTime });
+                        if (choice.customId == "noBlocks") {
+                            await choice.reply(`Steal successfully blocked, no challenges`)
+                        } else {
+                            await choice.reply(`${choice.user} has challenged ${action.user}`);
+                            if (await performChallenge(choice, choice.user, action.user, 2)) {
+                                hands.get(players[turn])[1] = hands.get(players[turn])[1] + 2;
+                                hands.get(target)[1] = hands.get(target)[1] - 2;
+                                await choice.followUp({content: `Challenge suceeded, Ambassador block fails, steal goes through! ${players[turn]} has gained 2 coins and now has ${hands.get(players[turn])[1]} coins.
+${target} has lost 2 coins and now has ${hands.get(target)[1]} coins`, components : []});
+                            } else {
+                                await choice.followUp(`Challenge failed, Ambassador block remains. Turn passes.`)
+                            }
+                        }
+                    } catch(e) {
+                        console.log(e);
+                        await choice.reply(`Steal successfully blocked, no challenges before timeout`)
+                    }
                 }
                 await endTurn(action, interaction.guild.id, global.games.get(interaction.guild.id));
             } catch(e) {

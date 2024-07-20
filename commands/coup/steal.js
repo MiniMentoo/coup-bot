@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
 const {endTurn, loseInfluence, performChallenge} = require('../../turn-utils.js');
 const {cardType, cardEmoji, thinkingTime} = require('../../config.json');
 
@@ -21,8 +21,38 @@ module.exports = {
             let hands = global.hands.get(interaction.guild.id);
             if (interaction.user == players[turn]) {
                 if (players.includes(target) && hands.get(target)[3]) {
-                    if (hands.get(target)[1] < 2) {
-                        //stuff
+                    if (hands.get(target)[1] >= 2) {
+                        deployedButtons = true;
+
+                        const captainBlock = new ButtonBuilder()
+                            .setCustomId('captainBlock')
+                            .setLabel(`Block with Captain`)
+                            .setStyle(ButtonStyle.Primary)
+                            .setEmoji(cardEmoji[0]);
+            
+                        const ambassadorBlock = new ButtonBuilder()
+                            .setCustomId('ambassadorBlock')
+                            .setLabel(`Block with Ambassador`)
+                            .setStyle(ButtonStyle.Primary)
+                            .setEmoji(cardEmoji[2]);
+
+                        const noBlocks = new ButtonBuilder()
+                            .setCustomId('noBlocks')
+                            .setLabel('No Blocks / Challenges')
+                            .setStyle(ButtonStyle.Secondary)
+                            .setEmoji('✅');
+                    
+                        const challenge = new ButtonBuilder()
+                            .setCustomId('challenge')
+                            .setLabel('Challenge')
+                            .setStyle(ButtonStyle.Danger)
+                            .setEmoji('❌');
+                        
+                        const row = new ActionRowBuilder()
+                            .addComponents(challenge, captainBlock, ambassadorBlock, noBlocks);
+                        
+                        reply = {content: `${interaction.user} is attempting to steal 2 coins from ${target}
+They will have ${hands.get(interaction.user)[1]} coins if this goes through. This action can be challenged by anyone or blocked with Captain / Ambassador.`, components : [row]};
                     } else {
                         reply = {content: `${target} doesn't have enough money to be stolen from, try someone else!`, ephemeral : true};
                     }

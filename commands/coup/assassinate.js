@@ -46,7 +46,7 @@ module.exports = {
                         const row = new ActionRowBuilder()
                             .addComponents(challenge, contessaBlock, noBlocks);
                         
-                        reply = {content: `${interaction.user} has spent 3 coins to attempt an assassination on ${target}
+                        reply = {content: `${interaction.user} is claiming Assassin ${cardEmoji[1]} and has spent 3 coins to attempt an assassination on ${target}
 They now have ${hands.get(interaction.user)[1]} coins. This action can be challenged by anyone or blocked with contessa.`, components : [row]};
                     } else {
                         reply = {content : `An assassination requires 3 coins, and you only have ${hands.get(interaction.user)[1]}`, ephemeral : true};

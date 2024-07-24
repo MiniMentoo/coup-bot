@@ -51,7 +51,7 @@ module.exports = {
                         const row = new ActionRowBuilder()
                             .addComponents(challenge, captainBlock, ambassadorBlock, noBlocks);
                         
-                        reply = {content: `${interaction.user} is attempting to steal 2 coins from ${target}
+                        reply = {content: `${interaction.user} is claiming Captain ${cardEmoji[0]} and is attempting to steal 2 coins from ${target}
 They will have ${hands.get(interaction.user)[1] + 2} coins if this goes through. This action can be challenged by anyone or blocked with Captain / Ambassador.`, components : [row]};
                     } else {
                         reply = {content: `${target} doesn't have enough money to be stolen from, try someone else!`, ephemeral : true};

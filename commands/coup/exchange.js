@@ -75,7 +75,7 @@ They will draw 2 cards from the deck and pick which roles to keep (they cannot r
 };
 
 
-async function returnTwo(card1, card2, card3, interaction) {
+async function pickOne(card1, card2, card3, interaction) {
     
     const return1 = new ButtonBuilder()
                 .setCustomId('return1')
@@ -98,6 +98,33 @@ async function returnTwo(card1, card2, card3, interaction) {
     const row = new ActionRowBuilder()
         .addComponents(return1, return2, return3);
 
-    const response = await interaction.followUp({content : `${interaction.user}, pick TWO of the following cards to return to the deck, the last one will be the card in your hand`, 
+    const response = await interaction.followUp({content : `${interaction.user}, pick the card you'll keep in your hand, the other two will go into the deck`, 
         components : [row], ephemeral : true});
+    const collectorFilter = i => players.includes(i.user);
+    const action = await response.awaitMessageComponent({filter : collectorFilter, time: thinkingTime});
+    const deck = global.gameInfo.get(interaction.guild.id);
+    try {
+        if (action.customId == 'return1') {
+            deck.push(card2);
+            deck.push(card3);
+            shuffle(deck);
+            response.reply({content : `Chosen ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
+            return card1;
+        } else if (action.customId == 'return2') {
+            deck.push(card1);
+            deck.push(card3);
+            shuffle(deck);
+            response.reply({content : `Chosen ${cardType[card2]} ${cardEmoji[card2]} to keep in hand`, ephemeral : true});
+            return card2;
+        } else {
+            deck.push(card1);
+            deck.push(card2);
+            shuffle(deck);
+            response.reply({content : `Chosen ${cardType[card3]} ${cardEmoji[card3]} to keep in hand`, ephemeral : true});
+            return card3;
+        }
+    } catch(e) {
+        console.log(e);
+        interaction.followUp({content : `Choice timed out, picked ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
+    }
 }

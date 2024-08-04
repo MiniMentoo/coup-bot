@@ -59,21 +59,34 @@ They will draw 2 cards from the deck and pick which roles to keep (they cannot r
                     await action.reply({content : `Drew the ${cardType[card1]} ${cardEmoji[card1]} and the ${cardType[card2]} ${cardEmoji[card2]}, pick cards to keep in your hand (the total number of cards you have must stay the same)`, ephemeral : true})
                     if (hand[0][0] == -1) {
                         hand[0][1] = await pickOne(card1, card2, hand[0][1], action);
-                        console.log(deck)
                     } else if (hand[0][1] == -1) {
-                        console.log(deck);
                         hand[0][0] = await pickOne(card1, card2, hand[0][0], action);
-                        console.log(deck);
                     } else {
-                        console.log(deck);
                         choices = await pickTwo(card1, card2, hand[0][0], hand[0][1], action);
                         hand[0][0] = choices[0];
-                        hand[0][1] = choices[1];
-                        console.log(choices);
-                        console.log(deck);
+                        hand[0][1] = choices[1];  
+                    }
+                } else {
+                    await action.reply(`${action.user} has challenged ${interaction.user}`);
+                    if (! await performChallenge(action, action.user, interaction.user, 2)) {
+                        await action.followUp({content: `Exchange going through`, components : []});
+                        let card1 = deck.splice(0,1)[0];
+                        let card2 = deck.splice(0,1)[0];
+                        await action.followUp({content : `Drew the ${cardType[card1]} ${cardEmoji[card1]} and the ${cardType[card2]} ${cardEmoji[card2]}, pick cards to keep in your hand (the total number of cards you have must stay the same)`, ephemeral : true})
+                        if (hand[0][0] == -1) {
+                            hand[0][1] = await pickOne(card1, card2, hand[0][1], action);
+                        } else if (hand[0][1] == -1) {
+                            hand[0][0] = await pickOne(card1, card2, hand[0][0], action);
+                        } else {
+                            choices = await pickTwo(card1, card2, hand[0][0], hand[0][1], action);
+                            hand[0][0] = choices[0];
+                            hand[0][1] = choices[1];  
+                        }
+                    } else {
+                        await action.followUp(`Exchange action failed as the challenge succeeded, turn passed.`);
                     }
                 }
-            
+                await endTurn(action, interaction.guild.id, players);
             } catch(e) {
                 console.log(e);
                 await action.update({content: `Buttons timed out, exchange going through`, components : []});

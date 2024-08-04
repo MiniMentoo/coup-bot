@@ -54,15 +54,16 @@ They will draw 2 cards from the deck and pick which roles to keep (they cannot r
                 const action = await response.awaitMessageComponent({filter : collectorFilter, time: thinkingTime});
                 await interaction.editReply({components : []});
                 if (action.customId == "noBlocks") {
+                    await action.reply({content: `Exchange going through`, components : []});
                     let card1 = deck.splice(0,1)[0];
                     let card2 = deck.splice(0,1)[0];
-                    await action.reply({content : `Drew the ${cardType[card1]} ${cardEmoji[card1]} and the ${cardType[card2]} ${cardEmoji[card2]}, pick cards to keep in your hand (the total number of cards you have must stay the same)`, ephemeral : true})
+                    await interaction.followUp({content : `Drew the ${cardType[card1]} ${cardEmoji[card1]} and the ${cardType[card2]} ${cardEmoji[card2]}, pick cards to keep in your hand (the total number of cards you have must stay the same)`, ephemeral : true})
                     if (hand[0][0] == -1) {
-                        hand[0][1] = await pickOne(card1, card2, hand[0][1], action);
+                        hand[0][1] = await pickOne(card1, card2, hand[0][1], interaction);
                     } else if (hand[0][1] == -1) {
-                        hand[0][0] = await pickOne(card1, card2, hand[0][0], action);
+                        hand[0][0] = await pickOne(card1, card2, hand[0][0], interaction);
                     } else {
-                        choices = await pickTwo(card1, card2, hand[0][0], hand[0][1], action);
+                        choices = await pickTwo(card1, card2, hand[0][0], hand[0][1], interaction);
                         hand[0][0] = choices[0];
                         hand[0][1] = choices[1];  
                     }
@@ -72,13 +73,13 @@ They will draw 2 cards from the deck and pick which roles to keep (they cannot r
                         await action.followUp({content: `Exchange going through`, components : []});
                         let card1 = deck.splice(0,1)[0];
                         let card2 = deck.splice(0,1)[0];
-                        await action.followUp({content : `Drew the ${cardType[card1]} ${cardEmoji[card1]} and the ${cardType[card2]} ${cardEmoji[card2]}, pick cards to keep in your hand (the total number of cards you have must stay the same)`, ephemeral : true})
+                        await interaction.followUp({content : `Drew the ${cardType[card1]} ${cardEmoji[card1]} and the ${cardType[card2]} ${cardEmoji[card2]}, pick cards to keep in your hand (the total number of cards you have must stay the same)`, ephemeral : true})
                         if (hand[0][0] == -1) {
-                            hand[0][1] = await pickOne(card1, card2, hand[0][1], action);
+                            hand[0][1] = await pickOne(card1, card2, hand[0][1], interaction);
                         } else if (hand[0][1] == -1) {
-                            hand[0][0] = await pickOne(card1, card2, hand[0][0], action);
+                            hand[0][0] = await pickOne(card1, card2, hand[0][0], interaction);
                         } else {
-                            choices = await pickTwo(card1, card2, hand[0][0], hand[0][1], action);
+                            choices = await pickTwo(card1, card2, hand[0][0], hand[0][1], interaction);
                             hand[0][0] = choices[0];
                             hand[0][1] = choices[1];  
                         }

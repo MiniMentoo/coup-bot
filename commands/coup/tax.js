@@ -12,7 +12,8 @@ module.exports = {
         if (global.games.has(interaction.guild.id) && (!global.gameInfo.get(interaction.guild.id).length == 0)){
             let players = global.games.get(interaction.guild.id);
             let turn = global.turns.get(interaction.guild.id);
-            if (interaction.user == players[turn]) {
+            if (interaction.user == players[turn]&& global.lock.get(interaction.guild.id) ){
+                global.lock.set(interaction.guild.id, false);
                 const challenge = new ButtonBuilder()
                 .setCustomId('challenge')
                 .setLabel('Challenge')

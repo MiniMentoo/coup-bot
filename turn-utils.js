@@ -30,6 +30,7 @@ It's ${players[turn]}'s turn right now` },
         global.gameInfo.delete(serverId);
         global.hands.delete(serverId);
         global.turns.delete(serverId);
+        global.lock.delete(serverId);
         await action.followUp({content : `🎉🎉GAME OVER! 🎉🎉
 ${winner} has won the game, congratulations!`, embeds : [embed]});
     } else {
@@ -39,6 +40,7 @@ ${winner} has won the game, congratulations!`, embeds : [embed]});
             turn = (turn + 1) % len;
         }
         global.turns.set(serverId, turn);
+        global.lock.set(serverId, true);
         await action.followUp({content: `${players[turn]} it's your turn, do /turn to take it`});
     }
 }

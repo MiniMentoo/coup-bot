@@ -19,9 +19,10 @@ module.exports = {
             let players = global.games.get(interaction.guild.id);
             let turn = global.turns.get(interaction.guild.id);
             let hands = global.hands.get(interaction.guild.id);
-            if (interaction.user == players[turn]) {
+            if (interaction.user == players[turn]&& global.lock.get(interaction.guild.id) ){
                 if (players.includes(target) && hands.get(target)[3]) {
                     if (hands.get(interaction.user)[1] >= 3) {
+                        global.lock.set(interaction.guild.id, false);
                         deployedAction = true;
                         hands.get(players[turn])[1] = hands.get(players[turn])[1] - 3;
 

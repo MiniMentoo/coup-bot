@@ -15,13 +15,14 @@ module.exports = {
         let reply = 'empty';
         let deployedAction = false;
         const target = interaction.options.getUser('target');
-        if (global.games.has(interaction.guild.id) && (!global.gameInfo.get(interaction.guild.id).length == 0)){
+        if (global.games.has(interaction.guild.id) && (!global.gameInfo.get(interaction.guild.id).length == 0)&& global.lock.get(interaction.guild.id) ){
             let players = global.games.get(interaction.guild.id);
             let turn = global.turns.get(interaction.guild.id);
             let hands = global.hands.get(interaction.guild.id);
             if (interaction.user == players[turn]) {
                 if (players.includes(target) && hands.get(target)[3]) {
                     if (hands.get(interaction.user)[1] >= 7) {
+                        global.lock.set(interaction.guild.id, false);
                         deployedAction = true;
                         hands.get(players[turn])[1] = hands.get(players[turn])[1] - 7;
                         reply = {content: `${interaction.user} has spent 7 coins and performed a coup on ${target}

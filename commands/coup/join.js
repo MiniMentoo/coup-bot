@@ -28,6 +28,7 @@ current members:
             global.gameInfo.set(interaction.guild.id, []);
             global.turns.set(interaction.guild.id, 0);
             global.hands.set(interaction.guild.id, new Map());
+            global.lock.set(interaction.guild.id, true);
             let gameUsers = global.games.get(interaction.guild.id);
             gameUsers.push(interaction.user);
             let gameHands = global.hands.get(interaction.guild.id);

@@ -13,7 +13,8 @@ module.exports = {
             let players = global.games.get(interaction.guild.id);
             let turn = global.turns.get(interaction.guild.id);
             let hands = global.hands.get(interaction.guild.id);
-            if (interaction.user == players[turn]) {
+            if (interaction.user == players[turn]&& global.lock.get(interaction.guild.id) ){
+                global.lock.set(interaction.guild.id, false);
                 deployedButtons = true;
                 
                 const challenge = new ButtonBuilder()

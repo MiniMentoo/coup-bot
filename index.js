@@ -8,7 +8,7 @@ global.games = new Map();
 global.gameInfo = new Map();
 global.hands = new Map();
 global.turns = new Map();
-
+global.lock = new Map();
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });

@@ -54,17 +54,23 @@ They will draw 2 cards from the deck and pick which roles to keep (they cannot r
                 const action = await response.awaitMessageComponent({filter : collectorFilter, time: thinkingTime});
                 await interaction.editReply({components : []});
                 if (action.customId == "noBlocks") {
-                    let card1 = deck.splice(0,1);
-                    let card2 = deck.splice(0,1);
+                    let card1 = deck.splice(0,1)[0];
+                    let card2 = deck.splice(0,1)[0];
                     await action.reply({content : `Drew the ${cardType[card1]} ${cardEmoji[card1]} and the ${cardType[card2]} ${cardEmoji[card2]}, pick cards to keep in your hand (the total number of cards you have must stay the same)`, ephemeral : true})
                     if (hand[0][0] == -1) {
                         hand[0][1] = await pickOne(card1, card2, hand[0][1], action);
+                        console.log(deck)
                     } else if (hand[0][1] == -1) {
                         console.log(deck);
                         hand[0][0] = await pickOne(card1, card2, hand[0][0], action);
                         console.log(deck);
                     } else {
-
+                        console.log(deck);
+                        choices = await pickTwo(card1, card2, hand[0][0], hand[0][1], action);
+                        hand[0][0] = choices[0];
+                        hand[0][1] = choices[1];
+                        console.log(choices);
+                        console.log(deck);
                     }
                 }
             
@@ -109,22 +115,22 @@ async function pickOne(card1, card2, card3, interaction) {
     const deck = global.gameInfo.get(interaction.guild.id);
     try {
         if (action.customId == 'return1') {
-            deck.push(card2[0]);
+            deck.push(card2);
             deck.push(card3);
             shuffle(deck);
             await interaction.followUp({content : `Chosen ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
             await action.update({components : []});
             return card1;
         } else if (action.customId == 'return2') {
-            deck.push(card1[0]);
+            deck.push(card1);
             deck.push(card3);
             shuffle(deck);
             await interaction.followUp({content : `Chosen ${cardType[card2]} ${cardEmoji[card2]} to keep in hand`, ephemeral : true});
             await action.update({components : []});
             return card2;
         } else {
-            deck.push(card1[0]);
-            deck.push(card2[0]);
+            deck.push(card1);
+            deck.push(card2);
             shuffle(deck);
             await interaction.followUp({content : `Chosen ${cardType[card3]} ${cardEmoji[card3]} to keep in hand`, ephemeral : true});
             await action.update({components : []});
@@ -133,5 +139,73 @@ async function pickOne(card1, card2, card3, interaction) {
     } catch(e) {
         console.log(e);
         await interaction.followUp({content : `Choice timed out, picked ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
+    }
+}
+
+async function pickTwo(card1, card2, card3, card4, interaction) {
+    choices = [];
+    
+    const return1 = new ButtonBuilder()
+                .setCustomId('return1')
+                .setLabel(`${cardType[card1]}`)
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji(`${cardEmoji[card1]}`);
+
+    const return2 = new ButtonBuilder()
+                .setCustomId('return2')
+                .setLabel(`${cardType[card2]}`)
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji(`${cardEmoji[card2]}`);
+    
+    const return3 = new ButtonBuilder()
+                .setCustomId('return3')
+                .setLabel(`${cardType[card3]}`)
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji(`${cardEmoji[card3]}`);
+
+    const return4 = new ButtonBuilder()
+                .setCustomId('return4')
+                .setLabel(`${cardType[card4]}`)
+                .setStyle(ButtonStyle.Secondary)
+                .setEmoji(`${cardEmoji[card4]}`);
+
+    const row = new ActionRowBuilder()
+        .addComponents(return1, return2, return3, return4);
+
+    const response = await interaction.followUp({content : `${interaction.user}, pick 2 cards you'll keep in your hand, the other two will go into the deck`, 
+        components : [row], ephemeral : true});
+    let players = global.games.get(interaction.guild.id);
+    const collectorFilter = i => players.includes(i.user);
+    const action = await response.awaitMessageComponent({filter : collectorFilter, time: thinkingTime});
+    const deck = global.gameInfo.get(interaction.guild.id);
+    try {
+        if (action.customId == 'return1') {
+            choices.push(card1);
+            await interaction.followUp({content : `Chosen ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
+            await action.update({components : []});
+            choices.push(await pickOne(card2, card3, card4, interaction));
+        } else if (action.customId == 'return2') {
+            choices.push(card2);
+            await interaction.followUp({content : `Chosen ${cardType[card2]} ${cardEmoji[card2]} to keep in hand`, ephemeral : true});
+            await action.update({components : []});
+            choices.push(await pickOne(card1, card3, card4, interaction));
+        } else if (action.customId == 'return3') {
+            choices.push(card3);
+            await interaction.followUp({content : `Chosen ${cardType[card3]} ${cardEmoji[card3]} to keep in hand`, ephemeral : true});
+            await action.update({components : []});
+            choices.push(await pickOne(card1, card2, card4, interaction));
+        } else {
+            choices.push(card4);
+            await interaction.followUp({content : `Chosen ${cardType[card4]} ${cardEmoji[card4]} to keep in hand`, ephemeral : true});
+            await action.update({components : []});   
+            choices.push(await pickOne(card1, card2, card3, interaction));         
+        }
+        return choices;
+    } catch(e) {
+        console.log(e);
+        await interaction.followUp({content : `Choice timed out, picked ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
+        choices.push(card1);
+        choices.push(await pickOne(card2, card3, card4, interaction));
+        return choices;
     }
 }

@@ -12,7 +12,7 @@ async function endTurn(action, serverId, players) {
             winner = player;
         }
     });
-    if (inCount == 1) {
+    if (inCount <= 1) {
         const embed = new EmbedBuilder()
         .setTitle(`End of game information`)
         .setColor( 0xbebebb )
@@ -21,7 +21,6 @@ async function endTurn(action, serverId, players) {
         const players = global.games.get(action.guild.id);
         const turn = global.turns.get(action.guild.id);
         let counter = 0;
-        console.log(players);
         embed.addFields(
             { name: 'Players', value: `${players}
 It's ${players[turn]}'s turn right now` },

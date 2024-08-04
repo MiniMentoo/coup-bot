@@ -6,7 +6,7 @@ const { setTimeout } = require("timers/promises");
 module.exports = {
     data : new SlashCommandBuilder()
         .setName('turn')
-        .setDescription('takes your turn if it is your turn'),
+        .setDescription('displays the possible actions if its your turn'),
     async execute(interaction) {
         const embed = new EmbedBuilder()
         .setTitle('Turn actions')

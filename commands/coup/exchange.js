@@ -56,10 +56,13 @@ They will draw 2 cards from the deck and pick which roles to keep (they cannot r
                 if (action.customId == "noBlocks") {
                     let card1 = deck.splice(0,1);
                     let card2 = deck.splice(0,1);
+                    await action.reply({content : `Drew the ${cardType[card1]} ${cardEmoji[card1]} and the ${cardType[card2]} ${cardEmoji[card2]}, pick cards to keep in your hand (the total number of cards you have must stay the same)`, ephemeral : true})
                     if (hand[0][0] == -1) {
-
+                        hand[0][1] = await pickOne(card1, card2, hand[0][1], action);
                     } else if (hand[0][1] == -1) {
-
+                        console.log(deck);
+                        hand[0][0] = await pickOne(card1, card2, hand[0][0], action);
+                        console.log(deck);
                     } else {
 
                     }
@@ -100,31 +103,35 @@ async function pickOne(card1, card2, card3, interaction) {
 
     const response = await interaction.followUp({content : `${interaction.user}, pick the card you'll keep in your hand, the other two will go into the deck`, 
         components : [row], ephemeral : true});
+    let players = global.games.get(interaction.guild.id);
     const collectorFilter = i => players.includes(i.user);
     const action = await response.awaitMessageComponent({filter : collectorFilter, time: thinkingTime});
     const deck = global.gameInfo.get(interaction.guild.id);
     try {
         if (action.customId == 'return1') {
-            deck.push(card2);
+            deck.push(card2[0]);
             deck.push(card3);
             shuffle(deck);
-            response.reply({content : `Chosen ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
+            await interaction.followUp({content : `Chosen ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
+            await action.update({components : []});
             return card1;
         } else if (action.customId == 'return2') {
-            deck.push(card1);
+            deck.push(card1[0]);
             deck.push(card3);
             shuffle(deck);
-            response.reply({content : `Chosen ${cardType[card2]} ${cardEmoji[card2]} to keep in hand`, ephemeral : true});
+            await interaction.followUp({content : `Chosen ${cardType[card2]} ${cardEmoji[card2]} to keep in hand`, ephemeral : true});
+            await action.update({components : []});
             return card2;
         } else {
-            deck.push(card1);
-            deck.push(card2);
+            deck.push(card1[0]);
+            deck.push(card2[0]);
             shuffle(deck);
-            response.reply({content : `Chosen ${cardType[card3]} ${cardEmoji[card3]} to keep in hand`, ephemeral : true});
+            await interaction.followUp({content : `Chosen ${cardType[card3]} ${cardEmoji[card3]} to keep in hand`, ephemeral : true});
+            await action.update({components : []});
             return card3;
         }
     } catch(e) {
         console.log(e);
-        interaction.followUp({content : `Choice timed out, picked ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
+        await interaction.followUp({content : `Choice timed out, picked ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
     }
 }

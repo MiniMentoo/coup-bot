@@ -27,6 +27,10 @@ async function endTurn(action, serverId, players) {
 It's ${players[turn]}'s turn right now` },
             { name: '\u200B', value: '\u200B' });
         hands.forEach((hand) => counter = addPlayerInfoToEmbed(counter, hand, players, embed));
+        global.games.delete(serverId);
+        global.gameInfo.delete(serverId);
+        global.hands.delete(serverId);
+        global.turns.delete(serverId);
         await action.followUp({content : `🎉🎉GAME OVER! 🎉🎉
 ${winner} has won the game, congratulations!`, embeds : [embed]});
     } else {

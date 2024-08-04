@@ -1,0 +1,8 @@
+{
+	"token": "PUT UR TOKEN HERE",
+  "clientId": "CLIENT ID HERE",
+	"guildId": "ID OF BOTS HOME SERVER HERE",
+	"cardType":  ["captain", "assassin", "ambassador", "duke", "contessa"], 
+	"cardEmoji": ["🟦", "⬛", "🟩", "🟪", "🟥"],
+	"thinkingTime" : 120000
+}

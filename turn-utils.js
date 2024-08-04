@@ -1,11 +1,31 @@
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
 const { cardType, cardEmoji, thinkingTime } = require('./config.json');
+const { addPlayerInfoToEmbed } = require('./commands/coup/public.js')
 
 
 async function endTurn(action, serverId, players) {
-    let turn = (global.turns.get(serverId) + 1) % players.length;
-    global.turns.set(serverId, turn);
-    await action.followUp({content: `${players[turn]} it's your turn, do /turn to take it`});
+    let inCount = 0;
+    let winner;
+    let hands = global.hands.get(serverId)
+    players.forEach(player => {
+        if (hands.get(player)[3]) {
+            inCount += 1;
+            winner = player;
+        }
+    });
+    if (inCount == 1) {
+        await action.followUp({content : `🎉🎉GAME OVER! 🎉🎉
+${winner} has won the game, congratulations!`});
+    } else {
+        const len = players.length;
+        let turn = (global.turns.get(serverId) + 1) % len;
+        while(! hands.get(players[turn])[3]) {
+            turn = (turn + 1) % len;
+            console.log(turn);
+        }
+        global.turns.set(serverId, turn);
+        await action.followUp({content: `${players[turn]} it's your turn, do /turn to take it`});
+    }
 }
 
 async function performChallenge(interaction, challenger, challengee, card) {

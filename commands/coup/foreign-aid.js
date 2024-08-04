@@ -87,13 +87,11 @@ module.exports = {
                             await endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
                         }
                     } catch(e) {
-                        console.log(e);
                         await choice.reply(`Foreign Aid successfully blocked, no challenges before timeout`)
                         endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
                     }
                 }
             } catch (e) {
-                console.log(e);
                 await interaction.followUp({ content : `No choice taken in 2 minutes, timing out. Do /foreign-aid again to take your turn.`});
             }
         }

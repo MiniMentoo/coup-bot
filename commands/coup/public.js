@@ -16,7 +16,6 @@ module.exports = {
         const players = global.games.get(interaction.guild.id);
         const turn = global.turns.get(interaction.guild.id);
         let counter = 0;
-        console.log(players);
         embed.addFields(
             { name: 'Players', value: `${players}
 It's ${players[turn]}'s turn right now` },

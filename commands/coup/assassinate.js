@@ -115,14 +115,12 @@ They now have ${hands.get(interaction.user)[1]} coins. This action can be challe
                             }
                         }
                     } catch(e) {
-                        console.log(e);
                         await choice.reply(`Assassination successfully blocked, no challenges before timeout`)
                         endTurn(choice, interaction.guild.id, global.games.get(interaction.guild.id));
                     }
                 }
                 await endTurn(action, interaction.guild.id, global.games.get(interaction.guild.id));
             } catch (e) {
-                console.log(e);
                 await interaction.update(`Thinking time timed out. Assassination going through!`);
                 await loseInfluence(interaction, target);
                 await endTurn(interaction, interaction.guild.id, global.games.get(interaction.guild.id));

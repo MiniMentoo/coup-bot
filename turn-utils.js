@@ -37,7 +37,6 @@ ${winner} has won the game, congratulations!`, embeds : [embed]});
         let turn = (global.turns.get(serverId) + 1) % len;
         while(! hands.get(players[turn])[3]) {
             turn = (turn + 1) % len;
-            console.log(turn);
         }
         global.turns.set(serverId, turn);
         await action.followUp({content: `${players[turn]} it's your turn, do /turn to take it`});
@@ -103,7 +102,6 @@ ${challenger} has lost the challenge and will lose an influence.`;
         await loseInfluence(choice, loser);
         return challengeSuccessful;
     } catch(e) {
-        console.log(e);
         await interaction.followUp(`${challengee} failed to respond, they failed the challenge automatically`);
         await loseInfluence(interaction, challengee);
         return true;
@@ -114,7 +112,6 @@ async function loseInfluence(interaction, player) {
     let hand = global.hands.get(interaction.guild.id).get(player);
     let reply = "empty";
     let deployedButtons = false;
-    console.log(hand);
     if ((hand[0][0] != -1) && (hand[0][1] != -1)) {
         const one = new ButtonBuilder()
             .setCustomId("one")
@@ -166,7 +163,6 @@ async function loseInfluence(interaction, player) {
             }
             await choice.reply(reply2);
         } catch (e) {
-            console.log(e)
             hand[2][0] = hand[0][0];
             hand[0][0] = -1;
             await interaction.followUp(`${player} has failed to respond, revealed the ${cardType[hand[2][0]]} ${cardEmoji[hand[2][0]]}, they have 1 card left hidden!`);

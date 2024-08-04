@@ -64,7 +64,6 @@ ${turnPlayer} it's your turn, do /turn to take it`, components: [] });
 					await confirmation.update({ content: 'Action cancelled', components: [] });
 				}
 			} catch (e) {
-				console.log(e);
 				await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling', components: [] });
 			}
 		}
@@ -91,5 +90,4 @@ function startGame(bonus, guildId) {
 		hand.push(true); //bool representing if player is still in game
 	});
 	global.gameInfo.set(guildId, deck);
-	console.log(global.gameInfo); //leaving this in for testing purposes delete later
 }

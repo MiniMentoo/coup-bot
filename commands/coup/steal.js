@@ -127,7 +127,6 @@ ${target} has lost 2 coins and now has ${hands.get(target)[1]} coins`, component
                             }
                         }
                     } catch(e) {
-                        console.log(e);
                         await choice.reply(`Steal successfully blocked, no challenges before timeout`)
                     }
                 } else if (action.customId == "ambassadorBlock") {
@@ -150,13 +149,11 @@ ${target} has lost 2 coins and now has ${hands.get(target)[1]} coins`, component
                             }
                         }
                     } catch(e) {
-                        console.log(e);
                         await choice.reply(`Steal successfully blocked, no challenges before timeout`)
                     }
                 }
                 await endTurn(action, interaction.guild.id, global.games.get(interaction.guild.id));
             } catch(e) {
-                console.log(e);
                 hands.get(players[turn])[1] = hands.get(players[turn])[1] + 2;
                 hands.get(target)[1] = hands.get(target)[1] - 2;
                 await action.update({content: `Buttons timed out, steal going through, ${players[turn]} has gained 2 coins and now has ${hands.get(players[turn])[1]} coins.

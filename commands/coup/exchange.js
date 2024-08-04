@@ -89,7 +89,6 @@ They will draw 2 cards from the deck and pick which roles to keep (they cannot r
                 }
                 await endTurn(action, interaction.guild.id, players);
             } catch(e) {
-                console.log(e);
                 await action.update({content: `Buttons timed out, exchange going through`, components : []});
                 await endTurn(action, interaction.guild.id, players);
             }
@@ -151,7 +150,6 @@ async function pickOne(card1, card2, card3, interaction) {
             return card3;
         }
     } catch(e) {
-        console.log(e);
         await interaction.followUp({content : `Choice timed out, picked ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
     }
 }
@@ -216,7 +214,6 @@ async function pickTwo(card1, card2, card3, card4, interaction) {
         }
         return choices;
     } catch(e) {
-        console.log(e);
         await interaction.followUp({content : `Choice timed out, picked ${cardType[card1]} ${cardEmoji[card1]} to keep in hand`, ephemeral : true});
         choices.push(card1);
         choices.push(await pickOne(card2, card3, card4, interaction));

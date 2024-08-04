@@ -61,7 +61,6 @@ module.exports = {
                     await endTurn(action, interaction.guild.id, players);
                 }
             } catch (e) {
-                console.log(e);
                 hands.get(players[turn])[1] = hands.get(players[turn])[1] + 3;
                 await interaction.update({content: `Thinking time timed out, Tax successfully performed! ${players[turn]} has gained 3 coins and now has ${hands.get(players[turn])[1]} coins.`, components : []});
                 await endTurn(interaction, interaction.guild.id, players);

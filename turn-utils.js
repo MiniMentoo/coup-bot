@@ -1,6 +1,5 @@
-const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder, EmbedBuilder } = require('discord.js');
 const { cardType, cardEmoji, thinkingTime } = require('./config.json');
-const { addPlayerInfoToEmbed } = require('./commands/coup/public.js')
 
 
 async function endTurn(action, serverId, players) {
@@ -14,8 +13,22 @@ async function endTurn(action, serverId, players) {
         }
     });
     if (inCount == 1) {
+        const embed = new EmbedBuilder()
+        .setTitle(`End of game information`)
+        .setColor( 0xbebebb )
+        .setThumbnail('https://imgur.com/fgo1Tls.png');
+        const hands = global.hands.get(action.guild.id);
+        const players = global.games.get(action.guild.id);
+        const turn = global.turns.get(action.guild.id);
+        let counter = 0;
+        console.log(players);
+        embed.addFields(
+            { name: 'Players', value: `${players}
+It's ${players[turn]}'s turn right now` },
+            { name: '\u200B', value: '\u200B' });
+        hands.forEach((hand) => counter = addPlayerInfoToEmbed(counter, hand, players, embed));
         await action.followUp({content : `🎉🎉GAME OVER! 🎉🎉
-${winner} has won the game, congratulations!`});
+${winner} has won the game, congratulations!`, embeds : [embed]});
     } else {
         const len = players.length;
         let turn = (global.turns.get(serverId) + 1) % len;
@@ -165,6 +178,36 @@ function shuffle(deck) {
 		[deck[i], deck[j]] = [deck[j], deck[i]];
 	}
 	return deck;
+}
+
+function addPlayerInfoToEmbed(counter, hand, players, embed) { //want to add ping to each user, and show question marks for unrevealed cards, and relevant emoji for revealed cards, remember some type of coin display and isOut display
+    let player = players[counter];
+    counter +=1;
+    let unknown = '';
+    if (hand[0][0] == -1){
+        unknown += cardEmoji[hand[2][0]]; //assumes if slot in hand is empty, it's put into the revealed slot
+    } else {
+        unknown += cardEmoji[hand[0][0]];
+    }
+    if (hand[0][1] == -1){
+        unknown += cardEmoji[hand[2][1]];
+    } else {
+        unknown += cardEmoji[hand[0][1]];
+    }
+    let alive = '';
+    if (hand[3]) {
+        alive += "✅";
+    } else {
+        alive += "❌";
+    }
+    embed.addFields(
+        { name: `${player.displayName}'s cards`, value: `${unknown}`, inline: true },
+        { name: 'Coins', value: `${hand[1]}`, inline: true },
+        { name: `Still alive?`, value : `${alive}`, inline: true},
+        { name: '\u200B', value: '\u200B' },
+    )
+
+    return counter;
 }
 
 module.exports = {
